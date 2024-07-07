@@ -1,26 +1,21 @@
-import express from 'express'
-import { Login, Register } from './Controllers/auth.controllers.js';
+import express from "express";
+import dotenv from "dotenv";
+import AllRoutes from "./Routes/index.js";
+import mongoose from "mongoose";
 const app = express();
-app.use(express.json()); //  parsing the json data into the javascript
+dotenv.config();
+app.use(express.json());
 
-app.post("/", function (req, res) {
- const {name, email, password }=req.body.userData;
- if(name&&email&&password){
-
-  res.send("Data captured");
- }
- else{
-
-  res.send("All fields are mandatory");
- }
+app.get("/", function (req, res) {
+  res.send("working.");
 });
 
-app.post('/register', Register)
-app.post('/login', Login)
+app.use("/api/v1", AllRoutes);
 
-app.get("/hello", function (req, res) {
-  res.send("Hello.");
+mongoose
+  .connect(process.env.MONGODB_URL)
+  .then(() => console.log("DB connected."));
+
+app.listen(process.env.PORT_NUMBER, () => {
+  console.log(`Server is running on port ${process.env.PORT_NUMBER}.`);
 });
-
-
-app.listen(3000)
