@@ -12,9 +12,6 @@ export const Register = async (req, res) => {
       return res.json({ success: false, error: "All fields are required." });
     }
 
-    // check to check email is exists
-    // incrypt the password then store it in mongodb
-
     const newUser = new User({
       name: name,
       email: email,
