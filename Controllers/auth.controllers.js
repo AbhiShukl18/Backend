@@ -2,7 +2,7 @@
 import User from "../Models/user.model.js";
 import bcrypt from "bcrypt";
 
-export const Login = (req, res) => {
+export const Login = async(req, res) => {
   res.send("Login completed.");
 };
 
