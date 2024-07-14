@@ -3,7 +3,37 @@ import User from "../Models/user.model.js";
 import bcrypt from "bcrypt";
 
 export const Login = async(req, res) => {
-  res.send("Login completed.");
+
+  try{
+    const {email, password}=req.body?.userData;
+    if(!email || !password){
+      return res.json({success:true, error: "All fields are mandatory"});
+    }
+
+    const isUserExists= await User.findOne({email:email});
+    if(!isUserExists){
+      return res.json({success:false, error:"Email not found"});
+    }
+    const isPasswordCorrect= await bcrypt.compare(
+      password,
+      isUserExists.password
+    );
+    console.log(isPasswordCorrect,"isPasswordCorrect");
+    if(!isPasswordCorrect){
+      return res.json({success:false, error: "Password is incorrect"});
+    }
+
+    const userData={name:isUserExists.name, email:isUserExists.email}
+    return res.json({success:true, message: "Login Successful", userData});
+
+  }
+
+  catch(error){
+
+    console.log(error);
+    return res.json({success: false, error: error})
+  }
+  // res.send("Login completed.");
 };
 
 export const Register = async (req, res) => {
