@@ -8,7 +8,7 @@ export const Login = async(req, res) => {
   try{
     const {email, password}=req.body?.userData;
     if(!email || !password){
-      return res.json({success:true, error: "All fields are mandatory"});
+      return res.json({success:false, error: "All fields are mandatory"});
     }
 
     const isUserExists= await User.findOne({email:email});
@@ -29,18 +29,17 @@ export const Login = async(req, res) => {
       {userId:isUserExists._id},
       process.env.JWT_SECRET
     );
-   
+    res.cookie("token", token);
     return res.json(
       {
         success:true, 
         message: "Login Successful", 
         userData,
-        token,
-        isUserExists,
+        
       }
     );
 
-  }
+  } 
 
 
  
