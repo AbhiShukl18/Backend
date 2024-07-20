@@ -97,7 +97,7 @@ export const RegisterAdmin = async (req, res) => {
   }
 };
 
-export const getCurrentAdmin = async (req, res) => {
+export const getCurrentUser = async (req, res) => {
   try {
     const token = req.cookies.token;
     // console.log(token, "token");
