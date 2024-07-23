@@ -1,133 +1,83 @@
+import Admin from "../Models/admin.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import Admin from "../Models/admin.model.js";
 
-export const AdminLogin = async(req, res) => {
-
-  try{
-    const {email, password}=req.body?.AdminuserData;
-    if(!email || !password){
-      return res.json({success:false, error: "All fields are mandatory"});
-    }
-
-    const isUserExists= await Admin.findOne({email:email});
-    if(!isUserExists){
-      return res.json({success:false, error:"Email not found"});
-    }
-    const isPasswordCorrect= await bcrypt.compare(
-      password,
-      isUserExists.password
-    );
-    console.log(isPasswordCorrect,"isPasswordCorrect");
-    if(!isPasswordCorrect){
-      return res.json({success:false, error: "Password is incorrect"});
-    }
-
-    const userData={name:isUserExists.name, email:isUserExists.email};
-    const token= await jwt.sign(
-      {userId:isUserExists._id},
-      process.env.JWT_SECRET
-    );
-    res.cookie("token", token);
-    return res.json(
-      {
-        success:true, 
-        message: "Login Successful", 
-        userData,
-        
-      }
-    );
-
-  } 
-
-
- 
-  catch(error){
-
-    console.log(error);
-    return res.json({success: false, error: error})
-  }
-  // res.send("Login completed.");
-};
-// Register
-export const RegisterAdmin = async (req, res) => {
+export const LoginAdmin = async (req, res) => {
   try {
-    const { name, email, password } = req.body.AdminuserData;
-    if (!name || !email || !password) {
+    const { email, password } = req.body?.adminData;
+    if (!email || !password) {
       return res.json({ success: false, error: "All fields are required." });
     }
 
-    // checking email id is existing or not
-    const emailexist=await Admin.findOne({email:email});
-    console.log(emailexist,"emailexist");
-
-    if(emailexist){
-
-      return res.json(
-        {
-          
-          success:false,
-          error:"Email id already exist, try with different details"
-        }
-      )
+    const isAdminExists = await Admin.findOne({ email: email });
+    if (!isAdminExists) {
+      return res.json({ success: false, error: "Email not found." });
     }
 
-    const encryptedPassword= await bcrypt.hash(password,10);
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      isAdminExists.password
+    );
+    console.log(isPasswordCorrect, "isPasswordCorrect");
+    if (!isPasswordCorrect) {
+      return res.json({ success: false, error: "Password is wrong." });
+    }
+    const adminData = {
+      name: isAdminExists.name,
+      email: isAdminExists.email,
+      role: "admin",
+    };
+    // add user data (context), add jwt token,
 
+    const token = await jwt.sign(
+      { adminId: isAdminExists._id },
+      process.env.JWT_SECRET
+    );
 
-    const newUser = new Admin({
+    res.cookie("token", token);
+    return res.json({
+      success: true,
+      message: "Login successfull.",
+      adminData,
+    });
+  } catch (error) {
+    return res.json({ success: false, error: error });
+  }
+};
+
+export const RegisterAdmin = async (req, res) => {
+  try {
+    const { name, email, password } = req.body.adminData;
+    if (!name || !email || !password) {
+      return res.json({ success: false, error: "All fields are required." });
+    }
+    // check to check email is exists - findOne / find
+    const isEmailExist = await Admin.findOne({ email: email });
+    console.log(isEmailExist, "isEmailExist");
+    if (isEmailExist) {
+      return res.json({
+        success: false,
+        error: "Email is exists, please use another one.",
+      });
+    }
+    // encrypt the password then store it in mongodb
+
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    const newAdmin = new Admin({
       name: name,
       email: email,
-      password:encryptedPassword,
+      password: encryptedPassword,
     });
 
-    
-    const responseFromDb = await newUser.save();
+    const responseFromDb = await newAdmin.save();
 
     return res.json({
-      encryptedPassword,
-      emailexist,
       success: true,
-      responseFromDb,
-      message: "Registeration Successfull.",
+      message: "Registeration Successfull for admin.",
     });
   } catch (error) {
     console.log(error, "error");
     return res.json({ error: error, success: false });
   }
 };
-
-export const getCurrentUser = async (req, res) => {
-  try {
-    const token = req.cookies.token;
-    // console.log(token, "token");
-    const data = await jwt.verify(token, process.env.JWT_SECRET);
-    console.log(data, "data");
-    const user = await Admin.findById(data?.userId);
-    if (!user) {
-      return res.json({ success: false });
-    }
-    const AdminuserData = { name: user.name, email: user.email };
-    return res.json({ success: true, userData });
-  } catch (error) {
-    return res.json({ success: false, error });
-  }
-};
-
-export const logoutAdmin = async (req, res) => {
-
-  try{
-
-    const token = req.cookies.token;
-    res.clearCookie('token');
-    return res.json({ success: true, message: 'Logged out successfully' });
-
-  }
-
-  catch(error){
-
-    return res.json({ success: false, error });
-  }
-
-
-}
