@@ -1,1 +1,3 @@
-node_modules/
+git rm -r --cached node_modules
+git rm --cached package-lock.json
+git commit -m "Remove node_modules and package-lock.json from repository"
