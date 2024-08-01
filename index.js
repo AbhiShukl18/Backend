@@ -24,6 +24,8 @@ app.get("/", function (req, res) {
 
 app.use("/api/v1", AllRoutes);
 
+
+
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => console.log("DB connected."));
