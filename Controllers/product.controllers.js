@@ -1,6 +1,6 @@
 import Admin from "../Models/admin.model.js";
 import Product from "../Models/product.model.js";
- 
+
 export const GetAllProducts = async (req, res) => {
   try {
     const products = await Product.find({});
@@ -11,18 +11,21 @@ export const GetAllProducts = async (req, res) => {
 };
 export const CreateNewProduct = async (req, res) => {
   try {
-    const { name, price, category, quantity, image, } = req.body.productData;
-    const {userId}=req.body
-    if (!name || !price || !category || !quantity || !image || !userId ) {
+    const { name, price, category, quantity, image } = req.body.productData;
+    const { userId } = req.body;
+    if (!name || !price || !category || !quantity || !image || !userId) {
       return res.json({ success: false, error: "All fields are required." });
     }
     // const isIdofAdmin= await Admin.findById(userId);
     // if(!isIdofAdmin){
     //   return res.json({ success: false, error: "Not allowed to add the product." });
 
-
     // }
-    const isProductExist = await Product.findOne({ name, category, creatorid:userId, });
+    const isProductExist = await Product.findOne({
+      name,
+      category,
+      creatorid: userId,
+    });
     if (isProductExist) {
       return res.json({ success: false, error: "Product is already exists." });
     }
@@ -33,7 +36,7 @@ export const CreateNewProduct = async (req, res) => {
       category,
       quantity,
       image,
-      creatorid:userId,
+      creatorid: userId,
     });
     await newProduct.save();
 
@@ -47,22 +50,57 @@ export const CreateNewProduct = async (req, res) => {
   }
 };
 
-export const GetSingleProducts = async (req,res)=>{
-
-  try{
-const { productId}=req.body;
-console.log(productId," product id")
-if(!productId){
-
-  return res.json({success:false, error: "Product id required"})
-}
-const product= await Product.findById(productId)
-return res.json({success:true, product})
+export const GetSingleProducts = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    console.log(productId, " product id");
+    if (!productId) {
+      return res.json({ success: false, error: "Product id required" });
+    }
+    const product = await Product.findById(productId);
+    return res.json({ success: true, product });
+  } catch (error) {
+    console.log(error);
+    return res.json({ error, success: false });
   }
+};
 
-  catch(error)
-  {
-    console.log(error)
-    return res.json({error, success:false});
+export const filter = async (req, res) => {
+  try {
+    const { price, price1,category } = req.body;
+    if (!price) {
+      return res.json({ success: false, error: "Price is required" });
+    }
+    // const filteredProducts= await Product.find({price: {$eq: price} })
+    // const filteredProducts= await Product.find({price: {$ne: price} })
+    // const filteredProducts= await Product.find({price: {$gt: price} })
+    // const filteredProducts= await Product.find({price: {$gte: price} })
+    // const filteredProducts= await Product.find({price: {$lt: price} })
+    // const filteredProducts= await Product.find({price: {$lte: price} })
+    // const filteredProducts= await Product.find({price: {$in: [price, price1]} })
+    // const filteredProducts = await Product.find({
+    //   $and: [{ price: { $gt: 1200 } }, { quantity: { $gte: 2 } }],
+    // });
+
+    //  const filteredProducts = await Product.find({
+    //   $or: [{ price: { $gt: 1200 } }, { quantity: { $gte: 2 } }],
+    // });
+
+    // const filteredProducts = await Product.find({
+    //   $nor: [{ price: { $gt: 1200 } }, { quantity: { $gte: 2 } }],
+    // });
+
+      // const filteredProducts= await Product.find({category: {$not: {$eq: category}} })
+      
+      // const filteredProducts= await Product.find({image: {$exists: true} })
+
+      const filteredProducts= await Product.find({price: {$type: "number"} })
+
+
+
+    return res.json({ success: true, products: filteredProducts });
+  } catch (error) {
+    console.log(error);
+    return res.json({ error: error, success: false });
   }
-}
+};
