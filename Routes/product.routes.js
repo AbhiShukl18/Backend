@@ -7,6 +7,7 @@ import {
   GetSingleProducts,
   agUnwinding,
   search,
+  range,
 } from "../Controllers/product.controllers.js";
 import { checkIsAdminValid } from "../middleware/all.middleware.js";
  
@@ -19,6 +20,7 @@ router.post('/filter',filter)
 router.post('/aggreration-pipeline',agPipeline)
 router.post("/ag-unwinding", agUnwinding);
 router.post("/search", search);
+router.post('/range',range)
 
 
 export default router;

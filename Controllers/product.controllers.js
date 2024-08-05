@@ -159,3 +159,16 @@ export const search = async (req, res) => {
     return res.json({ error: error, success: false });
   }
 };
+
+export const range = async (req, res) => {
+  try {
+    const { minPrice, maxPrice } = req.body;
+  const products = await Product.find({
+  $and:  [{ price: { $gte: minPrice}},{ price: { $lte: maxPrice}}],
+  });
+  console.log(products, "products")
+    res.json({ success: true, products });
+  } catch (error) {
+    return res.json({ error, success: false });
+  }
+};
