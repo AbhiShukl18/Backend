@@ -108,8 +108,8 @@ export const filter = async (req, res) => {
 export const agPipeline = async (req, res) => {
   try {
     const products = await Product.aggregate([
-      // { $match: { $or: [{ price: { $gt: 500 } }, { quantity: { $lt: 30 } }] } },
-      { $match: { price: { $gt: 500 }, quantity: { $lt: 30 } } },
+      { $match: { price: { $gt: 1100 }, quantity: { $lt: 2 } } },
+      // { $match: { $or: [{price: { $gt: 500 }}, {quantity: { $lte: 1 } }]} },
       {
         $group: {
           _id: "$category",
