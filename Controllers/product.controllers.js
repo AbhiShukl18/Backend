@@ -124,3 +124,38 @@ export const agPipeline = async (req, res) => {
     return res.json({ error: error, success: false });
   }
 };
+
+
+export const agUnwinding = async (req, res) => {
+  try {
+    const products = await Product.aggregate([
+      { $unwind: "$tags" },
+      // { $project: { name: 1, tags:1} },
+      { $project: { creatorid: 0, quantity:0, image:0 } },
+    ]);
+    res.json({ success: true, products });
+  } catch (error) {
+    console.log(error, "error");
+    return res.json({ error: error, success: false });
+  }
+};
+
+export const search = async (req, res) => {
+  try {
+    const { searchedWord, searchedWord1, searchedWord2 } = req.body;
+    const products = await Product.find({
+
+      // {name: { $regex: searchedWord , $options: "i"}}, 
+      $or:[
+      {name: { $regex: searchedWord , $options: "i"}}, 
+      {tags: { $regex: searchedWord1 , $options: "i"}},
+      {category: { $regex: searchedWord2 , $options: "i"}}
+    ],
+     });
+
+    res.json({ success: true, products });
+  } catch (error) {
+    console.log(error, "error");
+    return res.json({ error: error, success: false });
+  }
+};

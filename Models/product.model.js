@@ -9,6 +9,7 @@ const productSchema = new Schema({
   creatorid: {type:mongoose.Schema.Types.ObjectId,
     ref:"Admin"
   },
+  tags: [String],
 });
 
 const Product = model("Product", productSchema);
